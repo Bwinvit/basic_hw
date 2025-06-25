@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { z } from "zod"
 import {
   Dialog,
   DialogTitle,
@@ -10,6 +11,12 @@ import {
   TextField,
   Stack,
 } from "@mui/material"
+
+const roomSchema = z.object({
+  name: z.string().min(1),
+  type: z.string().min(1),
+  capacity: z.preprocess((val) => Number(val), z.number().int().positive()),
+})
 
 type Props = {
   hotelId: string
@@ -27,19 +34,22 @@ export default function AddRoomModal({
   const [name, setName] = useState("")
   const [type, setType] = useState("")
   const [capacity, setCapacity] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setError(null)
 
-    const parsedCapacity = Number(capacity)
-    if (!name || !type || Number.isNaN(parsedCapacity)) {
+    const result = roomSchema.safeParse({ name, type, capacity })
+    if (!result.success) {
+      setError("Please provide valid values.")
       return
     }
 
     await fetch(`/api/hotels/${hotelId}/rooms`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, type, capacity: parsedCapacity }),
+      body: JSON.stringify(result.data),
     })
 
     onSuccess()
@@ -79,6 +89,11 @@ export default function AddRoomModal({
               fullWidth
               inputProps={{ min: 1 }}
             />
+            {error && (
+              <p style={{ color: "red" }} data-testid="room-error">
+                {error}
+              </p>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>
