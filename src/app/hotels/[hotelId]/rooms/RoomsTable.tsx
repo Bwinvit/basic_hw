@@ -16,12 +16,14 @@ interface Props {
   hotelId: string;
   refreshTrigger?: unknown;
   onDeleteSuccess: () => void;
+  search?: string;
 }
 
 export default function RoomsTable({
   hotelId,
   refreshTrigger,
   onDeleteSuccess,
+  search = "",
 }: Props) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -77,7 +79,15 @@ export default function RoomsTable({
     },
   ];
 
-  const rows = rooms.map((room) => ({ id: room._id, ...room }));
+  const filteredRooms = rooms.filter((room) => {
+    const query = search.toLowerCase();
+    return (
+      room.name.toLowerCase().includes(query) ||
+      room.type.toLowerCase().includes(query)
+    );
+  });
+
+  const rows = filteredRooms.map((room) => ({ id: room._id, ...room }));
 
   return (
     <DataGrid rows={rows} columns={columns} loading={loading} autoHeight />
