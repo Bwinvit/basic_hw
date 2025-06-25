@@ -1,7 +1,10 @@
 "use client"
 
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import Link from "next/link";
+import { useState } from "react"
+import { DataGrid, GridColDef } from "@mui/x-data-grid"
+import { IconButton } from "@mui/material"
+import EditIcon from "@mui/icons-material/Edit"
+import EditHotelModal from "./EditHotelModal"
 
 export type Hotel = {
   _id: string;
@@ -9,11 +12,20 @@ export type Hotel = {
   city: string;
 };
 
-type Props = {
-  hotels: Hotel[];
-};
+interface Props {
+  hotels: Hotel[]
+  onEditSuccess?: () => void
+}
 
-export default function HotelsTable({ hotels }: Props) {
+export default function HotelsTable({ hotels, onEditSuccess }: Props) {
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null)
+  const [openEditModal, setOpenEditModal] = useState(false)
+
+  const handleEditClick = (hotel: Hotel) => {
+    setSelectedHotel(hotel)
+    setOpenEditModal(true)
+  }
+
   const columns: GridColDef[] = [
     { field: "name", headerName: "Name", flex: 1 },
     { field: "city", headerName: "City", flex: 1 },
@@ -21,18 +33,37 @@ export default function HotelsTable({ hotels }: Props) {
       field: "actions",
       headerName: "",
       sortable: false,
+      width: 80,
       renderCell: (params) => (
-        <Link href={`/hotels/${params.row.id}/rooms`}>Rooms</Link>
+        <IconButton
+          aria-label="edit"
+          onClick={() => handleEditClick(params.row as Hotel)}
+        >
+          <EditIcon />
+        </IconButton>
       ),
-      width: 150,
     },
-  ];
+  ]
 
-  const rows = hotels.map((hotel) => ({
-    id: hotel._id,
-    name: hotel.name,
-    city: hotel.city,
-  }));
+  const rows = hotels.map((hotel) => ({ id: hotel._id, ...hotel }))
 
-  return <DataGrid rows={rows} columns={columns} autoHeight />;
+  const handleClose = () => setOpenEditModal(false)
+
+  const handleSuccess = () => {
+    onEditSuccess?.()
+  }
+
+  return (
+    <>
+      <DataGrid rows={rows} columns={columns} autoHeight />
+      {selectedHotel && (
+        <EditHotelModal
+          hotel={selectedHotel}
+          open={openEditModal}
+          onClose={handleClose}
+          onSuccess={handleSuccess}
+        />
+      )}
+    </>
+  )
 }
