@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DataGrid, GridColDef } from "@mui/x-data-grid"
-import { IconButton } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
-import Link from "next/link"
-import EditHotelModal from "./EditHotelModal"
+import { useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Link from "next/link";
+import EditHotelModal from "./EditHotelModal";
 
 export type Hotel = {
   _id: string;
@@ -15,18 +15,18 @@ export type Hotel = {
 };
 
 interface Props {
-  hotels: Hotel[]
-  onEditSuccess?: () => void
+  hotels: Hotel[];
+  onEditSuccess?: () => void;
 }
 
 export default function HotelsTable({ hotels, onEditSuccess }: Props) {
-  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null)
-  const [openEditModal, setOpenEditModal] = useState(false)
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   const handleEditClick = (hotel: Hotel) => {
-    setSelectedHotel(hotel)
-    setOpenEditModal(true)
-  }
+    setSelectedHotel(hotel);
+    setOpenEditModal(true);
+  };
 
   const columns: GridColDef[] = [
     { field: "name", headerName: "Name", flex: 1 },
@@ -37,7 +37,7 @@ export default function HotelsTable({ hotels, onEditSuccess }: Props) {
       sortable: false,
       width: 120,
       renderCell: (params) => {
-        const hotel = params.row as Hotel
+        const hotel = params.row as Hotel;
         return (
           <>
             <IconButton
@@ -54,18 +54,18 @@ export default function HotelsTable({ hotels, onEditSuccess }: Props) {
               <ArrowForwardIcon />
             </IconButton>
           </>
-        )
+        );
       },
     },
-  ]
+  ];
 
-  const rows = hotels.map((hotel) => ({ id: hotel._id, ...hotel }))
+  const rows = hotels.map((hotel) => ({ id: hotel._id, ...hotel }));
 
-  const handleClose = () => setOpenEditModal(false)
+  const handleClose = () => setOpenEditModal(false);
 
   const handleSuccess = () => {
-    onEditSuccess?.()
-  }
+    onEditSuccess?.();
+  };
 
   return (
     <>
@@ -79,5 +79,5 @@ export default function HotelsTable({ hotels, onEditSuccess }: Props) {
         />
       )}
     </>
-  )
+  );
 }
