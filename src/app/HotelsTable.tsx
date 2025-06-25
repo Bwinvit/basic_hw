@@ -4,6 +4,8 @@ import { useState } from "react"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import { IconButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
+import Link from "next/link"
 import EditHotelModal from "./EditHotelModal"
 
 export type Hotel = {
@@ -33,15 +35,27 @@ export default function HotelsTable({ hotels, onEditSuccess }: Props) {
       field: "actions",
       headerName: "",
       sortable: false,
-      width: 80,
-      renderCell: (params) => (
-        <IconButton
-          aria-label="edit"
-          onClick={() => handleEditClick(params.row as Hotel)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
+      width: 120,
+      renderCell: (params) => {
+        const hotel = params.row as Hotel
+        return (
+          <>
+            <IconButton
+              aria-label="edit"
+              onClick={() => handleEditClick(hotel)}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              aria-label="rooms"
+              component={Link}
+              href={`/hotels/${hotel._id}/rooms`}
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+          </>
+        )
+      },
     },
   ]
 
