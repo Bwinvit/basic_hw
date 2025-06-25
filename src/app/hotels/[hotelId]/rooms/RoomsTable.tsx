@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { IconButton } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 export type Room = {
   _id: string
@@ -13,9 +15,10 @@ export type Room = {
 interface Props {
   hotelId: string
   refreshTrigger?: unknown
+  onDeleteSuccess: () => void
 }
 
-export default function RoomsTable({ hotelId, refreshTrigger }: Props) {
+export default function RoomsTable({ hotelId, refreshTrigger, onDeleteSuccess }: Props) {
   const [rooms, setRooms] = useState<Room[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -44,10 +47,30 @@ export default function RoomsTable({ hotelId, refreshTrigger }: Props) {
     }
   }, [hotelId, refreshTrigger])
 
+  const handleDelete = async (roomId: string) => {
+    await fetch(`/api/hotels/${hotelId}/rooms/${roomId}`, { method: 'DELETE' })
+    onDeleteSuccess()
+  }
+
   const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'type', headerName: 'Type', flex: 1 },
     { field: 'capacity', headerName: 'Capacity', type: 'number', flex: 1 },
+    {
+      field: 'actions',
+      headerName: '',
+      sortable: false,
+      renderCell: (params) => (
+        <IconButton
+          aria-label="delete"
+          color="error"
+          onClick={() => handleDelete(params.row.id as string)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+      width: 80,
+    },
   ]
 
   const rows = rooms.map((room) => ({ id: room._id, ...room }))

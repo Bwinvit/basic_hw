@@ -3,20 +3,18 @@
 import { useState } from 'react'
 import { Button } from '@mui/material'
 import AddRoomModal from './AddRoomModal'
-import RoomsTable, { type Room } from './RoomsTable'
-import { useRouter } from 'next/navigation'
+import RoomsTable from './RoomsTable'
 
 interface Props {
   hotelId: string
-  rooms: Room[]
 }
 
-export default function RoomsPageClient({ hotelId, rooms }: Props) {
+export default function RoomsPageClient({ hotelId }: Props) {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleSuccess = () => {
-    router.refresh()
+    setRefreshTrigger((prev) => prev + 1)
   }
 
   return (
@@ -31,7 +29,11 @@ export default function RoomsPageClient({ hotelId, rooms }: Props) {
         onSuccess={handleSuccess}
       />
       <div style={{ marginTop: '16px' }}>
-        <RoomsTable rooms={rooms} />
+        <RoomsTable
+          hotelId={hotelId}
+          refreshTrigger={refreshTrigger}
+          onDeleteSuccess={handleSuccess}
+        />
       </div>
     </div>
   )
