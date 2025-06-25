@@ -1,64 +1,68 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { IconButton } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { useEffect, useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export type Room = {
-  _id: string
-  name: string
-  type: string
-  capacity: number
-}
+  _id: string;
+  name: string;
+  type: string;
+  capacity: number;
+};
 
 interface Props {
-  hotelId: string
-  refreshTrigger?: unknown
-  onDeleteSuccess: () => void
+  hotelId: string;
+  refreshTrigger?: unknown;
+  onDeleteSuccess: () => void;
 }
 
-export default function RoomsTable({ hotelId, refreshTrigger, onDeleteSuccess }: Props) {
-  const [rooms, setRooms] = useState<Room[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+export default function RoomsTable({
+  hotelId,
+  refreshTrigger,
+  onDeleteSuccess,
+}: Props) {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let ignore = false
+    let ignore = false;
 
     async function fetchRooms() {
-      setLoading(true)
+      setLoading(true);
       try {
-        const res = await fetch(`/api/hotels/${hotelId}/rooms`)
-        const data: Room[] = await res.json()
+        const res = await fetch(`/api/hotels/${hotelId}/rooms`);
+        const data: Room[] = await res.json();
         if (!ignore) {
-          setRooms(data)
+          setRooms(data);
         }
       } finally {
         if (!ignore) {
-          setLoading(false)
+          setLoading(false);
         }
       }
     }
 
-    fetchRooms()
+    fetchRooms();
 
     return () => {
-      ignore = true
-    }
-  }, [hotelId, refreshTrigger])
+      ignore = true;
+    };
+  }, [hotelId, refreshTrigger]);
 
   const handleDelete = async (roomId: string) => {
-    await fetch(`/api/hotels/${hotelId}/rooms/${roomId}`, { method: 'DELETE' })
-    onDeleteSuccess()
-  }
+    await fetch(`/api/hotels/${hotelId}/rooms/${roomId}`, { method: "DELETE" });
+    onDeleteSuccess();
+  };
 
   const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'type', headerName: 'Type', flex: 1 },
-    { field: 'capacity', headerName: 'Capacity', type: 'number', flex: 1 },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
+    { field: "capacity", headerName: "Capacity", type: "number", flex: 1 },
     {
-      field: 'actions',
-      headerName: '',
+      field: "actions",
+      headerName: "",
       sortable: false,
       renderCell: (params) => (
         <IconButton
@@ -71,9 +75,11 @@ export default function RoomsTable({ hotelId, refreshTrigger, onDeleteSuccess }:
       ),
       width: 80,
     },
-  ]
+  ];
 
-  const rows = rooms.map((room) => ({ id: room._id, ...room }))
+  const rows = rooms.map((room) => ({ id: room._id, ...room }));
 
-  return <DataGrid rows={rows} columns={columns} loading={loading} autoHeight />
+  return (
+    <DataGrid rows={rows} columns={columns} loading={loading} autoHeight />
+  );
 }
